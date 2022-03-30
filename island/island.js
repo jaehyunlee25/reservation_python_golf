@@ -11,4 +11,4 @@ kids.forEach((tr,i) => {
 const elResult = document.createElement('div');
 elResult.id = 'elResult';
 elResult.innerHTML = JSON.stringify(result);
-document.body.appendChild(elResult);
+document.body.appendChild(elResult); 
