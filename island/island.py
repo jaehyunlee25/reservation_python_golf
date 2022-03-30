@@ -5,7 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime
 import time
 
-time.sleep(30)
+#time.sleep(30)
 print('\n\n\n\n\n\n== island ==')
 print('30 delayed')
 
@@ -44,14 +44,11 @@ con = f.read()
 f.close()
 
 print('2.0. selenium start')
-while True:
-    print('\n\n\n\n\n\n== island ==')
-    print('3.0. while start')
-    driver.get('https://www.islandresort.co.kr/html/reserve/reserve01.asp')
-    driver.implicitly_wait(3)
-    driver.execute_script(con)
-    print('4.0. while sleep 57')
-    time.sleep(57)
+print('\n\n\n\n\n\n== island ==')
+print('3.0. while start')
+driver.get('https://www.islandresort.co.kr/html/reserve/reserve01.asp')
+driver.implicitly_wait(3)
+driver.execute_script(con)
 
 """ result = driver.find_element(By.ID, 'dateListId1')
 f = open('../result.json', 'w')
