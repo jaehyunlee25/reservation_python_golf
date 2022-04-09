@@ -1,3 +1,8 @@
+const REPORT = document.createElement('input');
+REPORT.type = 'hidden';
+REPORT.id = 'REPORT';
+document.body.appendChild(REPORT);
+
 const year = '${year}';
 const month = '${month}';
 const date = '${date}';
@@ -12,4 +17,8 @@ times.forEach((el) => {
   if(el.href.indexOf(course) === -1) return;
   SEL_ITEM = el;
 });
-SEL_ITEM.click();
+if(!SEL_ITEM) {
+  REPORT.value = false;
+} else {
+  SEL_ITEM.click();
+}
