@@ -138,6 +138,15 @@ def island_search():
 
 @app.route('/island_cancel')
 def island_cancel():
+    # 파라미터
+    dict_param = {
+        'year': request.args.get('year'),
+        'month': request.args.get('month'),
+        'date': request.args.get('date'),
+        'course': request.args.get('course'),
+        'time': request.args.get('time'),
+    }
+
     print('1.0. login javascript call')
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
@@ -152,10 +161,30 @@ def island_cancel():
     driver.get('https://www.islandresort.co.kr/html/reserve/reserve02.asp')
     driver.implicitly_wait(3)
 
-    """ result = driver.find_element(By.TAG_NAME, 'body')
-    f = open('result.html', 'w')
-    f.write(result.get_attribute('innerHTML'))
-    f.close() """
+    # 참고자료
+    dict_course = {'EAST': 1, 'SOUTH': 2, 'WEST':3}
+    # 파라미터 세팅 및 시간선택
+    jscon = jsRead('island/island_cancel.js')
+    jscon = setParam(dict_param, jscon)
+    driver.execute_script(jscon)
+
+    REPORT = 'true'
+    try:
+        REPORT = driver.execute_script('return REPORT.value')
+    except:
+        print('normal')
+
+    # 취소실행
+    driver.execute_script("document.getElementById('SEL_BUTTON').click()")
+    # alert 처리
+    alert = WebDriverWait(driver, 10).until(expected_conditions.alert_is_present())
+    print(alert.text)
+    
+    # 예약을 취소 하시겠습니까?
+    alert.accept()
+    # 예약이 취소되었습니다.
+    alert.accept()
+    driver.close()
 
     return 'cancelled'
 
