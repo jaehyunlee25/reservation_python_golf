@@ -29,9 +29,20 @@ print('step 3 - flask')
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/hello')
-def hello():
-    return 'hello, world!!'
+
+# file division =================================
+
+def setParam(dict, jsStr):
+    for key, value in dict.items():
+        jsStr = re.sub('\$\{' + key + '\}', value, jsStr)
+    return jsStr
+def jsRead(file):
+    l = open(file, 'r')
+    lcon = l.read()
+    l.close()
+    return lcon
+
+# file division =================================
 
 @app.route('/island_reserve')
 def island_reserve():
@@ -188,15 +199,12 @@ def island_cancel():
 
     return 'cancelled'
 
-def setParam(dict, jsStr):
-    for key, value in dict.items():
-        jsStr = re.sub('\$\{' + key + '\}', value, jsStr)
-    return jsStr
-def jsRead(file):
-    l = open(file, 'r')
-    lcon = l.read()
-    l.close()
-    return lcon
+
+# file division =================================
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
+
+
+# file division =================================
+
