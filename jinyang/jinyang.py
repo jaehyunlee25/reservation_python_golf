@@ -1,5 +1,7 @@
-@app.route('/reserve/island')
-def island_reserve():
+# 주의점: 진양밸리는 로딩시간이 좀 늦으므로 time.sleep을 잘 살펴야 한다.
+
+@app.route('/reserve/jinyang')
+def jinyang_reserve():
     # 파라미터
     dict_param = {
         'login_id': request.args.get('login_id'),
@@ -15,7 +17,7 @@ def island_reserve():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     # 로그인 하기
-    jsLogin = jsRead('island/login.js')
+    jsLogin = jsRead('island/island_login.js')
     jsLogin = setParam(dict_param, jsLogin)
 
     driver.get('https://www.islandresort.co.kr/html/member/Login.asp')
@@ -34,7 +36,7 @@ def island_reserve():
     # 예약 날짜선택
     driver.execute_script("Date_Click('%s','%s','%s');" % (dict_param['year'], dict_param['month'], dict_param['date']))
     # 파라미터 세팅 및 시간선택
-    jscon = jsRead('island/reserve.js')
+    jscon = jsRead('island/island_reserve.js')
     jscon = setParam(dict_param, jscon)
     driver.execute_script(jscon)
 
@@ -80,8 +82,8 @@ def island_reserve():
 
     return json.dumps(obj)
 
-@app.route('/search/island')
-def island_search():
+@app.route('/search/jinyang')
+def jinyang_search():
     # 파라미터
     dict_param = {
         'login_id': request.args.get('login_id'),
@@ -90,29 +92,28 @@ def island_search():
     print('1.0. login javascript call')
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-    jsLogin = jsRead('island/login.js')
+    jsLogin = jsRead('jinyang/login.js')
     jsLogin = setParam(dict_param, jsLogin)
-
-    driver.get('https://www.islandresort.co.kr/html/member/Login.asp')
-    driver.implicitly_wait(3)
+    
+    driver.get('https://www.chinyangvalley.co.kr/member/login.asp')
     driver.execute_script(jsLogin)
-    driver.implicitly_wait(3)
+    time.sleep(0.5)
 
     print('2.0. reservation javascript call')
-    driver.get('https://www.islandresort.co.kr/html/reserve/reserve02.asp')
+    driver.get('https://www.chinyangvalley.co.kr/reservation/reserCheck.asp')
+    time.sleep(0.5)
     
-    con = jsRead('island/search.js')
+    con = jsRead('jinyang/search.js')
     driver.execute_script(con)
     
     val = driver.execute_script('return elResult.innerHTML')
-    driver.implicitly_wait(3)
-
+   
     driver.close()
 
     return val
 
-@app.route('/cancel/island')
-def island_cancel():
+@app.route('/cancel/jinyang')
+def jinyang_cancel():
     # 파라미터
     dict_param = {
         'login_id': request.args.get('login_id'),
@@ -122,28 +123,27 @@ def island_cancel():
         'date': request.args.get('date'),
         'course': request.args.get('course'),
         'time': request.args.get('time'),
-    }
-
+    }    
+    
     print('1.0. login javascript call')
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-
-    jsLogin = jsRead('island/login.js')
+    
+    jsLogin = jsRead('jinyang/login.js')
     jsLogin = setParam(dict_param, jsLogin)
     
-    driver.get('https://www.islandresort.co.kr/html/member/Login.asp')
-    driver.implicitly_wait(3)
+    driver.get('https://www.chinyangvalley.co.kr/member/login.asp')
     driver.execute_script(jsLogin)
-    driver.implicitly_wait(3)
+    time.sleep(0.5)
 
     print('2.0. reservation javascript call')
-    driver.get('https://www.islandresort.co.kr/html/reserve/reserve02.asp')
-    driver.implicitly_wait(3)
-
-    # 참고자료
-    dict_course = {'EAST': 1, 'SOUTH': 2, 'WEST':3}
+    driver.get('https://www.chinyangvalley.co.kr/reservation/reserCheck.asp')
+    time.sleep(0.5)
+    
+    
     # 파라미터 세팅 및 시간선택
-    jscon = jsRead('island/cancel.js')
+    jscon = jsRead('jinyang/cancel.js')
     jscon = setParam(dict_param, jscon)
+    print(jscon)
     driver.execute_script(jscon)
 
     REPORT = 'true'
@@ -152,16 +152,38 @@ def island_cancel():
     except:
         print('normal')
 
+    # 리턴 객체
+    obj = {
+        'process': 'okay',
+    }
+
+    if REPORT == 'false':
+        print('false')
+        obj['process'] = 'error'
+        obj['message'] = 'no such Reservation'
+        obj['isCancelled'] = False
+        return json.dumps(obj)
+
     # 취소실행
     driver.execute_script("document.getElementById('SEL_BUTTON').click()")
+
     # alert 처리
     alert = WebDriverWait(driver, 10).until(expected_conditions.alert_is_present())
     print(alert.text)
     
     # 예약을 취소 하시겠습니까?
     alert.accept()
+    time.sleep(0.5)
     # 예약이 취소되었습니다.
+    result = alert.text
     alert.accept()
     driver.close()
 
-    return 'cancelled'
+    if result.index('취소 되었습니다.') == -1:
+        obj['isCancelled'] = False
+    else:
+        obj['isCancelled'] = True
+
+    obj['message'] = result
+    
+    return json.dumps(obj)

@@ -15,7 +15,7 @@ arr = [
     'py/header.py',
     'py/common.py',
     'island/island.py',
-    # 'jinyang/jinyang.py',
+    'jinyang/jinyang.py',
     'py/footer.py',
 ]
 
