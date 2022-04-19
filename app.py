@@ -234,24 +234,26 @@ def jinyang_reserve():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     # 로그인 하기
-    jsLogin = jsRead('island/island_login.js')
+    jsLogin = jsRead('jinyang/login.js')
     jsLogin = setParam(dict_param, jsLogin)
 
-    driver.get('https://www.islandresort.co.kr/html/member/Login.asp')
-    driver.implicitly_wait(3)
+    driver.get('https://www.chinyangvalley.co.kr/member/login.asp')
     driver.execute_script(jsLogin)
-    driver.implicitly_wait(3)
+    time.sleep(0.5)
 
     # 예약절차 링크로 이동
     print('2.0. reservation javascript call')
-    driver.get('https://www.islandresort.co.kr/html/reserve/reserve01.asp')
-    driver.implicitly_wait(3)
+    driver.get('https://www.chinyangvalley.co.kr/reservation/reservation2.asp')
+    time.sleep(1)
 
-    # 참고자료
-    dict_course = {'EAST': 1, 'SOUTH': 2, 'WEST':3}
-    
     # 예약 날짜선택
-    driver.execute_script("Date_Click('%s','%s','%s');" % (dict_param['year'], dict_param['month'], dict_param['date']))
+    fulldate = "document.getElementById('%s').click();" % (dict_param['year'] + dict_param['month'] + dict_param['date'])
+    print(fulldate)
+    driver.execute_script(fulldate)
+    time.sleep(0.5)
+    val = driver.execute_script('return document.body.innerHTML')
+    print(val)
+    '''
     # 파라미터 세팅 및 시간선택
     jscon = jsRead('island/island_reserve.js')
     jscon = setParam(dict_param, jscon)
@@ -296,8 +298,8 @@ def jinyang_reserve():
         obj['isReserved'] = True
 
     obj['message'] = result
-
-    return json.dumps(obj)
+    '''
+    return 'json.dumps(obj)'
 
 @app.route('/search/jinyang')
 def jinyang_search():
