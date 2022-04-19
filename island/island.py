@@ -152,6 +152,17 @@ def island_cancel():
     except:
         print('normal')
 
+    # 리턴 객체
+    obj = {
+        'process': 'okay',
+    }
+
+    if REPORT == 'false':
+        obj['process'] = 'error'
+        obj['message'] = 'no such Reservation'
+        obj['isCancelled'] = False
+        return json.dumps(obj)
+
     # 취소실행
     driver.execute_script("document.getElementById('SEL_BUTTON').click()")
     # alert 처리
@@ -164,4 +175,6 @@ def island_cancel():
     alert.accept()
     driver.close()
 
-    return 'cancelled'
+    obj['message'] = '예약이 취소되었습니다.'
+
+    return json.dumps(obj)
