@@ -150,12 +150,18 @@ def island_search():
     con = jsRead('island/search.js')
     driver.execute_script(con)
     
+    result = {
+        'status': 'okay',
+        'golf_course_eng': 'island',
+    }
     val = driver.execute_script('return elResult.innerHTML')
     driver.implicitly_wait(3)
 
     driver.close()
 
-    return val
+    result['data'] = json.loads(val)
+
+    return json.dumps(result)
 
 @app.route('/cancel/island')
 def island_cancel():
@@ -198,6 +204,17 @@ def island_cancel():
     except:
         print('normal')
 
+    # 리턴 객체
+    obj = {
+        'process': 'okay',
+    }
+
+    if REPORT == 'false':
+        obj['process'] = 'error'
+        obj['message'] = 'no such Reservation'
+        obj['isCancelled'] = False
+        return json.dumps(obj)
+
     # 취소실행
     driver.execute_script("document.getElementById('SEL_BUTTON').click()")
     # alert 처리
@@ -210,7 +227,9 @@ def island_cancel():
     alert.accept()
     driver.close()
 
-    return 'cancelled'
+    obj['message'] = '예약이 취소되었습니다.'
+
+    return json.dumps(obj)
 
 
 # file division =================================
@@ -248,17 +267,14 @@ def jinyang_reserve():
 
     # 예약 날짜선택
     fulldate = "document.getElementById('%s').click();" % (dict_param['year'] + dict_param['month'] + dict_param['date'])
-    print(fulldate)
     driver.execute_script(fulldate)
-    time.sleep(0.5)
-    val = driver.execute_script('return document.body.innerHTML')
-    print(val)
-    '''
+    time.sleep(1)
     # 파라미터 세팅 및 시간선택
-    jscon = jsRead('island/island_reserve.js')
+    jscon = jsRead('jinyang/reserve.js')
     jscon = setParam(dict_param, jscon)
     driver.execute_script(jscon)
 
+    '''
     REPORT = 'true'
     try:
         REPORT = driver.execute_script('return REPORT.value')

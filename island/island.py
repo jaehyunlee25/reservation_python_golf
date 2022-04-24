@@ -104,12 +104,18 @@ def island_search():
     con = jsRead('island/search.js')
     driver.execute_script(con)
     
+    result = {
+        'status': 'okay',
+        'golf_course_eng': 'island',
+    }
     val = driver.execute_script('return elResult.innerHTML')
     driver.implicitly_wait(3)
 
     driver.close()
 
-    return val
+    result['data'] = json.loads(val)
+
+    return json.dumps(result)
 
 @app.route('/cancel/island')
 def island_cancel():
