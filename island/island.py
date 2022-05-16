@@ -184,3 +184,40 @@ def island_cancel():
     obj['message'] = '예약이 취소되었습니다.'
 
     return json.dumps(obj)
+
+@app.route('/login/island')
+def island_login():
+    # 파라미터
+    dict_param = {
+        'login_id': request.args.get('login_id'),
+        'login_password': request.args.get('login_password'),
+    }
+    print('1.0. login javascript call')
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+
+    jsLogin = jsRead('island/login.js')
+    jsLogin = setParam(dict_param, jsLogin)
+
+    # 리턴 객체
+    obj = {
+        'process': 'okay',
+    }
+
+    try:
+        driver.get('https://www.islandresort.co.kr/html/member/Login.asp')
+        driver.execute_script(jsLogin)
+    except:
+        obj['process'] = 'error'
+        obj['message'] = 'login error'
+        return json.dumps(obj)
+        
+    # alert 처리 - alert이 생기면 로그인 에러
+    try:
+        alert = WebDriverWait(driver, 1).until(expected_conditions.alert_is_present())
+        print(alert.text)
+        obj['message'] = alert.text
+    except:
+        obj['message'] = 'login success'
+    
+
+    return json.dumps(obj)
